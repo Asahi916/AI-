@@ -50,31 +50,27 @@
       margin-bottom: 8px;
       color: #222;
     }
-    ul {
+    ul, ol {
       padding-left: 20px;
     }
     li {
-      margin-bottom: 6px;
+      margin-bottom: 8px;
     }
-    .note {
-      background-color: #fff8e6;
-      border-left: 4px solid #f5a623;
-      padding: 10px 15px;
-      font-size: 0.9em;
-      margin-top: 10px;
+    code {
+      background-color: #eef2f6;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: Consolas, Monaco, monospace;
+      font-size: 0.95em;
+      color: #d63384;
     }
-    .btn-link {
-      display: inline-block;
-      background-color: #005bab;
-      color: #fff;
-      padding: 10px 18px;
-      text-decoration: none;
-      border-radius: 5px;
-      font-weight: bold;
-      margin-top: 5px;
-    }
-    .btn-link:hover {
-      background-color: #004482;
+    .placeholder-box {
+      background-color: #f8fafc;
+      border: 2px dashed #cbd5e1;
+      border-radius: 6px;
+      padding: 15px 20px;
+      color: #475569;
+      margin-top: 8px;
     }
     footer {
       text-align: center;
@@ -93,22 +89,22 @@
 
   <section>
     <h2>1. 作品概要</h2>
-    <p>電子基板の異常箇所や不具合の原因をAIによって解析・特定し、トラブルシューティングを支援するRTミドルウェアシステムです。カメラ画像や測定データをもとにAIが診断を行い、初心者でも迅速に基板の不具合箇所を発見できるようにします。</p>
+    <p>カメラで撮影した電子基板の画像をもとに、AIが異常箇所や不具合の診断を行い、結果をわかりやすく画面に表示するRTミドルウェアシステムです。各機能を独立したRTコンポーネント（RTC）として実装し、バッチファイルおよび専用ランチャーから簡単に一括起動・操作できるように設計しています。</p>
   </section>
 
   <section>
     <h2>2. 使用したRTミドルウェアのバージョン</h2>
     <ul>
-      <li>OpenRTM-aist 2.0.1（Python / C++）</li>
+      <li>OpenRTM-aist 2.0.x（Python版）</li>
     </ul>
   </section>
 
   <section>
     <h2>3. 開発環境・開発言語・使用デバイス</h2>
     <ul>
-      <li><strong>OS・開発環境：</strong>Windows 11 / Ubuntu 22.04、OpenRTP</li>
-      <li><strong>開発言語：</strong>Python</li>
-      <li><strong>使用デバイス：</strong>PC、Webカメラ（USBカメラ）、対象電子基板</li>
+      <li><strong>OS・開発環境：</strong>Windows 10 / 11、OpenRTP</li>
+      <li><strong>開発言語：</strong>Python（バッチ起動スクリプト：Windows Batch）</li>
+      <li><strong>使用デバイス：</strong>PC、Webカメラ（USBカメラ）、診断対象の電子基板</li>
     </ul>
   </section>
 
@@ -116,30 +112,44 @@
     <h2>4. 開発したRTC・再利用したコンポーネント</h2>
     <h3>新規開発したRTC</h3>
     <ul>
-      <li><strong>BoardDiagnosisRTC（AI診断コンポーネント）：</strong>取得した基板データや画像からAIモデルを用いて異常判定・原因推論を行うRTC</li>
-      <li><strong>ResultViewerRTC（診断結果表示コンポーネント）：</strong>AIによるトラブルシューティング結果や対処法を画面に表示するRTC</li>
+      <li><strong><code>Camera_RTC.py</code>（カメラ画像取得RTC）：</strong>Webカメラから基板の映像を取得し、他のコンポーネントへ画像データを送信します。</li>
+      <li><strong><code>AIDiagnosis_RTC.py</code>（AI診断RTC）：</strong>受信した基板画像に対してAIモデルによる解析を実行し、トラブル箇所や診断結果を出力します。</li>
+      <li><strong><code>Display_RTC.py</code>（診断結果表示RTC）：</strong>カメラ映像およびAIによる診断結果をユーザー向けに画面表示します。</li>
+    </ul>
+    <h3>システム起動・制御プログラム</h3>
+    <ul>
+      <li><strong><code>Launcher.py</code> / <code>Start_BoardAI.bat</code>：</strong>ネームサーバーや各RTCの起動・接続・アクティブ化をスムーズに行うための起動スクリプト・ランチャーです。</li>
     </ul>
     <h3>再利用したコンポーネント</h3>
     <ul>
-      <li><strong>WebCameraRTC：</strong>カメラから基板画像を取得するために使用（OpenRTM公式サンプルコンポーネント）</li>
+      <li>なし（すべて新規に実装したPython製RTCで構成しています）</li>
     </ul>
   </section>
 
   <section>
-    <h2>5. 関連ドキュメント</h2>
+    <h2>5. 関連ドキュメント・発表スライド</h2>
     <ul>
-      <li><a href="https://github.com" target="_blank">GitHubリポジトリ（ソースコード・ドキュメント）</a></li>
+      <li><strong>操作マニュアル：</strong><code>基板AI診断_マニュアル.pdf</code>（リポジトリ内に同梱）</li>
+      <li><strong>ソースコード一式：</strong><a href="https://github.com" target="_blank">GitHubリポジトリ（Asahi916/AI-）</a></li>
     </ul>
+    <h3>発表スライド</h3>
+    <div class="placeholder-box">
+      発表スライドは現在準備中です。完成次第、こちらにリンクまたは埋め込みを掲載します。
+    </div>
   </section>
 
   <section>
     <h2>6. 動作方法・デモ動画</h2>
     <h3>動作方法</h3>
-    <p>1. ネームサーバー（rtm-naming）を起動します。<br>
-       2. 各RTC（カメラ入力・AI診断・結果表示）を起動します。<br>
-       3. RTSystemEditor上で各ポートを接続し、すべてのRTCをActivate（アクティブ化）すると診断が開始されます。</p>
+    <ol>
+      <li>リポジトリ内のファイル一式をダウンロード・展開します。</li>
+      <li><code>Start_BoardAI.bat</code> を実行してシステム（<code>Launcher.py</code> および各RTC）を起動します。</li>
+      <li>Webカメラで基板を映し、<code>Display_RTC</code> の画面上でAIによる診断結果を確認します（詳細は <code>基板AI診断_マニュアル.pdf</code> を参照）。</li>
+    </ol>
     <h3>デモ動画</h3>
-    <div class="note">デモ動画は現在準備中です。公開次第こちらにリンクを掲載します。</div>
+    <div class="placeholder-box">
+      デモ動画は現在準備中です。公開次第、こちらに動画リンクを掲載します。
+    </div>
   </section>
 
   <footer>
