@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AIを用いた基板トラブルシューティング - RTミドルウェアコンテスト</title>
+  <title>基板AI診断（AIを用いた基板トラブルシューティング） - RTミドルウェアコンテスト</title>
   <style>
     body {
       font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
       line-height: 1.7;
       color: #333;
-      max-width: 850px;
+      max-width: 880px;
       margin: 0 auto;
       padding: 20px;
       background-color: #f4f7f9;
@@ -17,7 +17,7 @@
     header {
       background-color: #005bab;
       color: #fff;
-      padding: 30px 20px;
+      padding: 32px 20px;
       border-radius: 8px;
       text-align: center;
       margin-bottom: 25px;
@@ -33,7 +33,7 @@
     }
     section {
       background: #fff;
-      padding: 20px 25px;
+      padding: 22px 26px;
       margin-bottom: 20px;
       border-radius: 8px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.06);
@@ -46,12 +46,13 @@
       font-size: 1.3em;
     }
     h3 {
-      font-size: 1.1em;
+      font-size: 1.08em;
+      margin-top: 18px;
       margin-bottom: 8px;
       color: #222;
     }
     ul, ol {
-      padding-left: 20px;
+      padding-left: 22px;
     }
     li {
       margin-bottom: 8px;
@@ -64,6 +65,31 @@
       font-size: 0.95em;
       color: #d63384;
     }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0;
+      font-size: 0.95em;
+    }
+    th, td {
+      border: 1px solid #d1d9e0;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    th {
+      background-color: #f0f4f8;
+      color: #1e293b;
+      font-weight: bold;
+    }
+    .flow-box {
+      background-color: #eef6ff;
+      border-left: 4px solid #005bab;
+      padding: 12px 16px;
+      font-weight: bold;
+      margin: 12px 0;
+      text-align: center;
+      font-family: Consolas, Monaco, monospace;
+    }
     .placeholder-box {
       background-color: #f8fafc;
       border: 2px dashed #cbd5e1;
@@ -71,6 +97,20 @@
       padding: 15px 20px;
       color: #475569;
       margin-top: 8px;
+    }
+    .btn-link {
+      display: inline-block;
+      background-color: #005bab;
+      color: #fff;
+      padding: 9px 16px;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+      margin-right: 10px;
+      margin-top: 5px;
+    }
+    .btn-link:hover {
+      background-color: #004482;
     }
     footer {
       text-align: center;
@@ -83,55 +123,109 @@
 <body>
 
   <header>
-    <h1>AIを用いた基板トラブルシューティング</h1>
+    <h1>基板AI診断（AIを用いた基板トラブルシューティング）</h1>
     <p>RTミドルウェアコンテスト 応募作品</p>
   </header>
 
   <section>
     <h2>1. 作品概要</h2>
-    <p>カメラで撮影した電子基板の画像をもとに、AIが異常箇所や不具合の診断を行い、結果をわかりやすく画面に表示するRTミドルウェアシステムです。各機能を独立したRTコンポーネント（RTC）として実装し、バッチファイルおよび専用ランチャーから簡単に一括起動・操作できるように設計しています。</p>
+    <p><strong>「基板AI診断」</strong>は、動かない電子回路基板の写真を Google の Gemini API に送信し、不具合の原因候補や次に確認すべき手順を日本語で提示するRTミドルウェアシステムです。</p>
+    <ul>
+      <li><strong>視覚的な原因特定：</strong>診断結果は「まとめ」と「詳細」で表示し、異常が疑われる箇所は基板写真の上に赤い枠と番号で分かりやすく示します。</li>
+      <li><strong>多角的な手がかりの入力：</strong>故障基板の写真だけでなく、正常な基板の写真・回路図・使用部品の写真や症状メモを添えることで診断精度を高められます。</li>
+      <li><strong>診断履歴と一致率の記録：</strong>診断ごとに結果と画像を自動保存し、後から「当たり・外れ」を入力してAI診断の一致率を集計・確認できます。</li>
+      <li><strong>ワンクリック起動：</strong>専用ランチャー（<code>Launcher.py</code>）により、ネームサーバーと3つのRTCの起動・ポート接続・アクティブ化・停止を自動で行えます。</li>
+    </ul>
   </section>
 
   <section>
     <h2>2. 使用したRTミドルウェアのバージョン</h2>
     <ul>
-      <li>OpenRTM-aist 2.0.x（Python版）</li>
+      <li><strong>OpenRTM-aist 2.1.0</strong>（Windows 64bit版 / Python）</li>
     </ul>
   </section>
 
   <section>
     <h2>3. 開発環境・開発言語・使用デバイス</h2>
-    <ul>
-      <li><strong>OS・開発環境：</strong>Windows 10 / 11、OpenRTP</li>
-      <li><strong>開発言語：</strong>Python（バッチ起動スクリプト：Windows Batch）</li>
-      <li><strong>使用デバイス：</strong>PC、Webカメラ（USBカメラ）、診断対象の電子基板</li>
-    </ul>
+    <table>
+      <tr>
+        <th>項目</th>
+        <th>内容</th>
+      </tr>
+      <tr>
+        <td><strong>OS</strong></td>
+        <td>Windows 11（64bit）</td>
+      </tr>
+      <tr>
+        <td><strong>開発言語</strong></td>
+        <td>Python 3.14.6（GUI：tkinter、起動スクリプト：Windows Batch）</td>
+      </tr>
+      <tr>
+        <td><strong>使用ライブラリ</strong></td>
+        <td><code>opencv-python</code>、<code>google-genai</code>、<code>pillow</code></td>
+      </tr>
+      <tr>
+        <td><strong>外部API</strong></td>
+        <td>Google Gemini API（要APIキー）</td>
+      </tr>
+      <tr>
+        <td><strong>使用デバイス</strong></td>
+        <td>Windows PC、Webカメラ（PC内蔵カメラまたはUSBカメラ）、診断対象の電子回路基板</td>
+      </tr>
+    </table>
   </section>
 
   <section>
     <h2>4. 開発したRTC・再利用したコンポーネント</h2>
+    <p>本システムは、機能を役割ごとに分離した3つのRTコンポーネント（RTC）と、それらを一括制御するランチャーで構成されています。</p>
+    <div class="flow-box">Camera_RTC（入力） ──[TimedString]──▶ AIDiagnosis_RTC（AI診断） ──[TimedString]──▶ Display_RTC（結果表示）</div>
+
     <h3>新規開発したRTC</h3>
+    <table>
+      <tr>
+        <th>コンポーネント名</th>
+        <th>役割・機能</th>
+        <th>ポート仕様</th>
+      </tr>
+      <tr>
+        <td><code>Camera_RTC.py</code></td>
+        <td>基板写真の撮影（Webカメラ）または既存画像の選択、正常基板・回路図・部品画像や症状メモの入力、診断依頼の送信を行うGUIコンポーネント。</td>
+        <td>OutPort: <code>request_out</code><br>(TimedString / JSON形式)</td>
+      </tr>
+      <tr>
+        <td><code>AIDiagnosis_RTC.py</code></td>
+        <td>受け取った画像パスと説明文をもとに Gemini API で異常解析を行い、怪しい箇所に赤枠・番号を描画した画像の作成とログ記録を行うコンポーネント。</td>
+        <td>InPort: <code>request_in</code><br>OutPort: <code>result_out</code><br>(TimedString / JSON形式)</td>
+      </tr>
+      <tr>
+        <td><code>Display_RTC.py</code></td>
+        <td>診断の経過と結果（「まとめ」「詳細」切替）、赤枠付き写真の別ウィンドウ表示、診断の当たり外れ評価の記録・一致率集計を行うGUIコンポーネント。</td>
+        <td>InPort: <code>result_in</code><br>(TimedString / JSON形式)</td>
+      </tr>
+    </table>
+
+    <h3>起動・制御プログラム</h3>
     <ul>
-      <li><strong><code>Camera_RTC.py</code>（カメラ画像取得RTC）：</strong>Webカメラから基板の映像を取得し、他のコンポーネントへ画像データを送信します。</li>
-      <li><strong><code>AIDiagnosis_RTC.py</code>（AI診断RTC）：</strong>受信した基板画像に対してAIモデルによる解析を実行し、トラブル箇所や診断結果を出力します。</li>
-      <li><strong><code>Display_RTC.py</code>（診断結果表示RTC）：</strong>カメラ映像およびAIによる診断結果をユーザー向けに画面表示します。</li>
+      <li><code>Launcher.py</code> / <code>Start_BoardAI.bat</code>：環境チェック、ネームサーバー（omniNames）および3つのRTCの自動起動・ポート接続・アクティブ化・一括停止を行うランチャー。</li>
     </ul>
-    <h3>システム起動・制御プログラム</h3>
-    <ul>
-      <li><strong><code>Launcher.py</code> / <code>Start_BoardAI.bat</code>：</strong>ネームサーバーや各RTCの起動・接続・アクティブ化をスムーズに行うための起動スクリプト・ランチャーです。</li>
-    </ul>
+
     <h3>再利用したコンポーネント</h3>
     <ul>
-      <li>なし（すべて新規に実装したPython製RTCで構成しています）</li>
+      <li>なし（すべてのRTCおよびランチャーをPythonで新規開発しています）</li>
     </ul>
   </section>
 
   <section>
     <h2>5. 関連ドキュメント・発表スライド</h2>
+    <p>
+      <a class="btn-link" href="基板AI診断_マニュアル.pdf" target="_blank">ユーザーマニュアル（PDF）を開く</a>
+      <a class="btn-link" href="https://github.com" target="_blank">GitHubリポジトリ（ソースコード一式）</a>
+    </p>
     <ul>
-      <li><strong>操作マニュアル：</strong><code>基板AI診断_マニュアル.pdf</code>（リポジトリ内に同梱）</li>
-      <li><strong>ソースコード一式：</strong><a href="https://github.com" target="_blank">GitHubリポジトリ（Asahi916/AI-）</a></li>
+      <li><strong>ユーザーマニュアル（<code>基板AI診断_マニュアル.pdf</code>）：</strong>インストール手順、APIキー設定、各画面の操作方法、トラブルシューティング、ポート仕様を記載した全25ページのマニュアルです。</li>
+      <li><strong>ソースコード一式：</strong>リポジトリ内の <code>Start_BoardAI.bat</code> および各 <code>.py</code> ファイルからダウンロード可能です。</li>
     </ul>
+
     <h3>発表スライド</h3>
     <div class="placeholder-box">
       発表スライドは現在準備中です。完成次第、こちらにリンクまたは埋め込みを掲載します。
@@ -140,12 +234,14 @@
 
   <section>
     <h2>6. 動作方法・デモ動画</h2>
-    <h3>動作方法</h3>
+    <h3>動作方法（クイックスタート）</h3>
     <ol>
-      <li>リポジトリ内のファイル一式をダウンロード・展開します。</li>
-      <li><code>Start_BoardAI.bat</code> を実行してシステム（<code>Launcher.py</code> および各RTC）を起動します。</li>
-      <li>Webカメラで基板を映し、<code>Display_RTC</code> の画面上でAIによる診断結果を確認します（詳細は <code>基板AI診断_マニュアル.pdf</code> を参照）。</li>
+      <li><strong>事前準備：</strong>Python 3、OpenRTM-aist 2.1.0、および必要ライブラリ（<code>pip install opencv-python google-genai pillow</code>）をインストールし、Google AI Studio で Gemini APIキーを取得します。</li>
+      <li><strong>起動：</strong>リポジトリのファイル一式を展開したフォルダ（例：<code>C:\board_ai</code>）内の <code>Start_BoardAI.bat</code> をダブルクリックします。</li>
+      <li><strong>システム開始：</strong>ランチャー画面で「Gemini APIキー」を入力して「開始」を押すと、3つのRTCが自動で起動・接続・アクティブ化されます。</li>
+      <li><strong>診断実行：</strong><code>Camera_RTC</code> で基板の写真を撮影または選択し、「診断へ送る」を押すと、10〜60秒ほどで <code>Display_RTC</code> に診断結果と赤枠付きの箇所表示が現れます（詳細はユーザーマニュアル参照）。</li>
     </ol>
+
     <h3>デモ動画</h3>
     <div class="placeholder-box">
       デモ動画は現在準備中です。公開次第、こちらに動画リンクを掲載します。
@@ -153,7 +249,7 @@
   </section>
 
   <footer>
-    <p>&copy; 2026 Asahi916</p>
+    <p>&copy; 2026 Asahi916 - 基板AI診断 (RTミドルウェアコンテスト応募作品)</p>
   </footer>
 
 </body>
